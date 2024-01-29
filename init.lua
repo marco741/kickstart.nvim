@@ -610,4 +610,3 @@ cmp.setup {
 
 require('custom.editor_settings')
 require('custom.remaps')
-
