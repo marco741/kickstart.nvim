@@ -309,6 +309,7 @@ require('telescope').setup {
       i = {
         ['<C-u>'] = false,
         ['<C-d>'] = false,
+        ["?"] = require("telescope.actions.layout").toggle_preview,
       },
     },
   },
