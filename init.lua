@@ -305,6 +305,11 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- See `:help telescope` and `:help telescope.setup()`
 require('telescope').setup {
   defaults = {
+    -- path_display = { shorten = { len = 3, exclude = { 3, -1 } } },
+    path_display = function(opts, path)
+      local tail = require("telescope.utils").path_tail(path)
+      return string.format("%s (%s)", tail, path)
+    end,
     mappings = {
       i = {
         ['<C-u>'] = false,

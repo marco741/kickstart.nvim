@@ -3,5 +3,7 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  require("custom.plugins.harpoon")
+  require("custom.plugins.harpoon"),
+  require("custom.plugins.surround"),
+  'ThePrimeagen/vim-be-good',
 }
