@@ -5,5 +5,6 @@
 return {
   require("custom.plugins.harpoon"),
   require("custom.plugins.surround"),
+  require("custom.plugins.netrw"),
   'ThePrimeagen/vim-be-good',
 }
