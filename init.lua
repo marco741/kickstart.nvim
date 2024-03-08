@@ -111,8 +111,18 @@ require('lazy').setup({
     },
   },
 
-  -- Useful plugin to show you pending keybinds.
+
   { 'folke/which-key.nvim',  opts = {} },
+  {
+    "akinsho/toggleterm.nvim",
+    event = "VeryLazy",
+    version = "*",
+    opts = {
+      size = 10,
+      open_mapping = "<c-s>",
+    }
+  },
+
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -154,11 +164,13 @@ require('lazy').setup({
   },
 
   {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
+    "marko-cerovac/material.nvim",
+    name = "material",
     priority = 1000,
     config = function()
-      vim.cmd.colorscheme 'onedark'
+      require("material").setup {}
+      vim.g.material_style = "darker"
+      vim.cmd.colorscheme "material"
     end,
   },
 
@@ -212,6 +224,57 @@ require('lazy').setup({
           return vim.fn.executable 'make' == 1
         end,
       },
+    },
+  },
+  {
+    "RRethy/vim-illuminate",
+    event = { "BufReadPost", "BufNewFile", "BufWritePre" },
+    opts = {
+      filetypes_denylist = {
+        "dirvish",
+        "fugitive",
+        "neo-tree",
+        "alpha",
+        "NvimTree",
+        "neo-tree",
+        "dashboard",
+        "TelescopePrompt",
+        "TelescopeResult",
+        "DressingInput",
+        "neo-tree-popup",
+        "markdown",
+        "",
+      },
+      delay = 100,
+      large_file_cutoff = 2000,
+      large_file_overrides = {
+        providers = { "lsp" },
+      },
+    },
+    config = function(_, opts)
+      require("illuminate").configure(opts)
+
+      local function map(key, dir, buffer)
+        vim.keymap.set("n", key, function()
+          require("illuminate")["goto_" .. dir .. "_reference"](false)
+        end, { desc = dir:sub(1, 1):upper() .. dir:sub(2) .. " Reference", buffer = buffer })
+      end
+
+      map("]]", "next")
+      map("[[", "prev")
+
+      -- also set it after loading ftplugins, since a lot overwrite [[ and ]]
+      vim.api.nvim_create_autocmd("FileType", {
+        callback = function()
+          local buffer = vim.api.nvim_get_current_buf()
+          map("]]", "next", buffer)
+          map("[[", "prev", buffer)
+        end,
+      })
+    end,
+    keys = {
+      { "]]", desc = "Next Reference" },
+      { "[[", desc = "Prev Reference" },
     },
   },
 
@@ -423,26 +486,26 @@ vim.defer_fn(function()
           ['ic'] = '@class.inner',
         },
       },
-      move = {
-        enable = true,
-        set_jumps = true, -- whether to set jumps in the jumplist
-        goto_next_start = {
-          [']m'] = '@function.outer',
-          [']]'] = '@class.outer',
-        },
-        goto_next_end = {
-          [']M'] = '@function.outer',
-          [']['] = '@class.outer',
-        },
-        goto_previous_start = {
-          ['[m'] = '@function.outer',
-          ['[['] = '@class.outer',
-        },
-        goto_previous_end = {
-          ['[M'] = '@function.outer',
-          ['[]'] = '@class.outer',
-        },
-      },
+      -- move = {
+      --   enable = true,
+      --   set_jumps = true, -- whether to set jumps in the jumplist
+      --   goto_next_start = {
+      --     [']m'] = '@function.outer',
+      --     [']]'] = '@class.outer',
+      --   },
+      --   goto_next_end = {
+      --     [']M'] = '@function.outer',
+      --     [']['] = '@class.outer',
+      --   },
+      --   goto_previous_start = {
+      --     ['[m'] = '@function.outer',
+      --     ['[['] = '@class.outer',
+      --   },
+      --   goto_previous_end = {
+      --     ['[M'] = '@function.outer',
+      --     ['[]'] = '@class.outer',
+      --   },
+      -- },
       swap = {
         enable = false,
         swap_next = {
@@ -529,6 +592,7 @@ local servers = {
   -- clangd = {},
   gopls = {},
   pyright = {},
+  pylsp = {},
   -- rust_analyzer = {},
   -- tsserver = {},
   -- html = { filetypes = { 'html', 'twig', 'hbs'} },
